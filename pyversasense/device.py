@@ -1,23 +1,16 @@
 class Device:
     
-    def __init__(self, name, status, mac, address, peripherals):
-        self._name = name
-        self._status = status
-        self._mac = mac
+    def __init__(self, address, peripherals, name, description, location, type, battery, version, mac, status):
         self._address = address
         self._peripherals = peripherals
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def status(self):
-        return self._status
-
-    @property
-    def mac(self):
-        return self._mac
+        self._name = name
+        self._description = description
+        self._location = location
+        self._type = type
+        self._battery = battery
+        self._version = version
+        self._mac = mac
+        self._status = status
 
     @property
     def address(self):
@@ -27,24 +20,34 @@ class Device:
     def peripherals(self):
         return self._peripherals
 
-    @name.setter
-    def name(self, name):
-        self._name = name
+    @property
+    def name(self):
+        return self._name
 
-    @status.setter
-    def status(self, status):
-        self._status = status
+    @property
+    def description(self):
+        return self._description
 
-    @mac.setter
-    def mac(self, mac):
-        self._mac = mac
+    @property
+    def location(self):
+        return self._location
 
-    @address.setter
-    def address(self, address):
-        self._address = address
+    @property
+    def type(self):
+        return self._type
 
-    @peripherals.setter
-    def peripherals(self, peripherals):
-        self._peripherals = peripherals
+    @property
+    def battery(self):
+        return self._battery
 
+    @property
+    def version(self):
+        return self._version
+        
+    @property
+    def mac(self):
+        return self._mac
 
+    @property
+    def status(self):
+        return self._status
