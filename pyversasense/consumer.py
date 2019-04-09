@@ -34,36 +34,32 @@ class Consumer:
 
     async def fetchPeripheralSample(self, peripheral):
         url = self._host + ENDPOINT_DEVICES + "/" + peripheral.parentMac + "/peripherals/" + peripheral.identifier + "/sample"
-        response = "e"
         try:
-            response = await self._webRequest(self._webSession, url)
+            response = await _webRequest(self._webSession, url)
         except Exception as e:
             print(e)
+            return False
         return response
 
     async def fetchDevices(self):
         self.deviceList.clear()
         url = self._host + ENDPOINT_DEVICES
         try:
-            response = await self._webRequest(self._webSession, url)
+            response = await _webRequest(self._webSession, url)
         except Exception as e:
             print(e)
             return False
-
-        print(response)
-
         self.deviceList =  _jsonToDeviceList(response)
+        return self.deviceList
 
-        return True
-
-    async def _webRequest(self, websession, url):
-        async with websession.get(url, headers=headers) as response:
-            print(response.status)
-            if response.status == 200:
-                data = await response.json(content_type=None)
-            else:
-                raise Exception('Bad response status code: {}'.format(response.status))
-        return data
+async def _webRequest(websession, url):
+    async with websession.get(url, headers=headers) as response:
+        print(response.status)
+        if response.status == 200:
+            data = await response.json(content_type=None)
+        else:
+            raise Exception('Bad response status code: {}'.format(response.status))
+    return data
 
 def _jsonToDeviceList(json):
     deviceList = []
