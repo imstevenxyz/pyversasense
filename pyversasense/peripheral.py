@@ -41,6 +41,3 @@ class Peripheral:
     @property
     def parentMac(self):
         return self._parentMac
-
-    def getSample(self, consumer):
-        return consumer.fetchPeripheralSample(self)
