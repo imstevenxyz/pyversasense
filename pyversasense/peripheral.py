@@ -1,6 +1,6 @@
 class Peripheral:
     
-    def __init__(self, samplingRate, identifier, lastUpdated, color, icon, text, classification, deviceMac):
+    def __init__(self, samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac):
         self._samplingRate = samplingRate
         self._identifier = identifier
         self._lastUpdated = lastUpdated
@@ -8,7 +8,7 @@ class Peripheral:
         self._icon = icon
         self._text = text
         self._classification = classification
-        self._deviceMac = deviceMac
+        self._parentMac = parentMac
 
     @property
     def samplingRate(self):
@@ -38,5 +38,9 @@ class Peripheral:
     def classification(self):
         return self._classification
 
+    @property
+    def parentMac(self):
+        return self._parentMac
+
     def getSample(self, consumer):
-        return consumer.fetchPeripheralSample(self._deviceMac, self._identifier)
+        return consumer.fetchPeripheralSample(self)

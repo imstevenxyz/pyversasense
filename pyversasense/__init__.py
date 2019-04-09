@@ -6,9 +6,10 @@ from .peripheral import Peripheral
 from .const import (ENDPOINT_DEVICES)
 
 header = {'Content-Type': 'application/json'}
-deviceList = []
 
 class Consumer:
+
+    deviceList = []
 
     def __init__(self, host):
         self._host = host
@@ -21,18 +22,23 @@ class Consumer:
     def host(self, host):
         self._host = host
 
-    def fetchPeripheralSample(self, mac, identifier):
-        url = self._host + ENDPOINT_DEVICES + "/" + mac + "/peripherals/" + identifier + "/sample"
-        print(url)
+    def fetchPeripheralSample(self, peripheral):
+        url = self._host + ENDPOINT_DEVICES + "/" + peripheral.parentMac + "/peripherals/" + peripheral.identifier + "/sample"
         response = requests.get(url, header)
+        print(response)
         return response.json()
 
     def fetchDevices(self):
-        deviceList.clear()
+        self.deviceList.clear()
         url = self._host + ENDPOINT_DEVICES
         response = requests.get(url, header)
         #todo check response code
-        for jsonDevice in response.json():
+        self._jsonToDeviceList(response.json())
+
+        return True
+
+    def _jsonToDeviceList(self, json):
+        for jsonDevice in json:
             address = jsonDevice["address"]
             peripherals = jsonDevice["peripherals"]
             name = jsonDevice["name"]
@@ -43,14 +49,12 @@ class Consumer:
             version =jsonDevice["version"]
             mac = jsonDevice["mac"]
             status = jsonDevice["status"]
-
+            
             peripheralList = self._jsonToPeripheralList(peripherals, mac)
 
-            deviceList.append(Device(address, peripheralList, name, description, location, type, battery, version, mac, status))
+            self.deviceList.append(Device(address, peripheralList, name, description, location, type, battery, version, mac, status))
 
-        return True
-
-    def _jsonToPeripheralList(self, json, deviceMac):
+    def _jsonToPeripheralList(self, json, parentMac):
         peripheralList =  []
         for peripheral in json:
             samplingRate = peripheral["sampling_rate"]
@@ -60,16 +64,16 @@ class Consumer:
             icon = peripheral["icon"]
             text = peripheral["text"]
             classification = peripheral["class"]
-            peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, deviceMac))
+            peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac))
         return peripheralList
 
 def test():
-    url = "https://e0464716-c94d-47b9-867a-c297d6caa1d2.mock.pstmn.io"
+    #url = "https://e0464716-c94d-47b9-867a-c297d6caa1d2.mock.pstmn.io"
+    url = "https://gateway.versasense.com:8889"
     consumer = Consumer(url)
     consumer.fetchDevices()
-    for d in deviceList:
+    for d in consumer.deviceList:
         for per in d.peripherals:
-            print(per.identifier)
-            print(per.getSample(consumer))
+            print(consumer.fetchPeripheralSample(per))
 
     return True
