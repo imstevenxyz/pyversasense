@@ -3,7 +3,7 @@ from setuptools import setup
 long_description = open('README.md').read()
 
 setup(
-    name='pyversasense-flamm3blemuff1n',
+    name='pyversasense',
     version='0.0.1',
     description='Versasense API consumer',
     long_description=long_description,
