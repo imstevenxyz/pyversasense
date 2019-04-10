@@ -3,10 +3,9 @@ import aiohttp
 
 from .consumer import Consumer
 
-url = "https://107731e1-6ad3-4fac-937c-e115c6b5343f.mock.pstmn.io"
-#url = "https://gateway.versasense.com:8889"
+url = "https://gateway.versasense.com:8889"
 
-async def main():
+async def main(url):
     async with aiohttp.ClientSession() as session:
         consumer = Consumer(url, session)
         await consumer.fetchDevices()
@@ -18,5 +17,5 @@ async def main():
 
     return True
 
-def test():
-    asyncio.get_event_loop().run_until_complete(main())
+def test(url = url):
+    asyncio.get_event_loop().run_until_complete(main(url))

@@ -1,8 +1,6 @@
 from setuptools import setup
 
 long_description = open('README.md').read()
-with open('requirements.txt') as req:
-    requirements = req.read().splitlines()
 
 setup(
     name='pyversasense-flamm3blemuff1n',
@@ -16,5 +14,10 @@ setup(
     license='Apache License 2.0',
     packages=['pyversasense'],
     zip_safe=True,
-    install_requires=requirements
+    install_requires=['aiohttp>=3.5.4'],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+        "License :: OSI Approved :: Apache Software License"
+    ],
 )
