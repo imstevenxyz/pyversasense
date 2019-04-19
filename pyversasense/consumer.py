@@ -33,6 +33,7 @@ class Consumer:
         self._webSession = webSession
 
     async def fetchPeripheralSample(self, peripheral):
+        """Get a sample for a peripheral."""
         url = self._host + ENDPOINT_DEVICES + "/" + peripheral.parentMac + "/peripherals/" + peripheral.identifier + "/sample"
         try:
             response = await _webRequest(self._webSession, url)
@@ -42,6 +43,7 @@ class Consumer:
         return response
 
     async def fetchDevices(self):
+        """Get all devices from API and convert respoonse a list."""
         self.deviceList.clear()
         url = self._host + ENDPOINT_DEVICES
         try:
@@ -52,16 +54,8 @@ class Consumer:
         self.deviceList =  _jsonToDeviceList(response)
         return self.deviceList
 
-async def _webRequest(websession, url):
-    async with websession.get(url, headers=headers) as response:
-        print(response.status)
-        if response.status == 200:
-            data = await response.json(content_type=None)
-        else:
-            raise Exception('Bad response status code: {}'.format(response.status))
-    return data
-
 def _jsonToDeviceList(json):
+    """Convert json to list of Device objects."""
     deviceList = []
     for jsonDevice in json:
         address = jsonDevice["address"]
@@ -79,6 +73,7 @@ def _jsonToDeviceList(json):
     return deviceList
 
 def _jsonToPeripheralList(json, parentMac):
+    """Convert json to list of Peripheral objects."""
     peripheralList =  []
     for peripheral in json:
         samplingRate = peripheral["sampling_rate"]
@@ -90,3 +85,12 @@ def _jsonToPeripheralList(json, parentMac):
         classification = peripheral["class"]
         peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac))
     return peripheralList
+
+async def _webRequest(websession, url):
+    """Send a webrequest."""
+    async with websession.get(url, headers=headers) as response:
+        if response.status == 200:
+            data = await response.json(content_type=None)
+        else:
+            raise Exception('Bad response status code: {}'.format(response.status))
+    return data

@@ -1,4 +1,5 @@
 class Peripheral:
+    """Representation of a peripheral, e.g. sensor."""
     
     def __init__(self, samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac):
         self._samplingRate = samplingRate

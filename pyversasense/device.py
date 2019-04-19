@@ -1,5 +1,6 @@
 class Device:
-    
+    """Representation of a device e.g hub."""
+
     def __init__(self, address, peripherals, name, description, location, type, battery, version, mac, status):
         self._address = address
         self._peripherals = peripherals
