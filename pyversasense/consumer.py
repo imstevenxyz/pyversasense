@@ -4,6 +4,7 @@ import aiohttp
 
 from .device import Device
 from .peripheral import Peripheral
+from .sample import Sample
 from .const import (ENDPOINT_DEVICES)
 
 headers = {'Content-Type': 'application/json'}
@@ -43,7 +44,7 @@ class Consumer:
         return response
 
     async def fetchDevices(self):
-        """Get all devices from API and convert respoonse a list."""
+        """Get all devices from API and convert response to a list."""
         self.deviceList.clear()
         url = self._host + ENDPOINT_DEVICES
         try:
@@ -85,6 +86,13 @@ def _jsonToPeripheralList(json, parentMac):
         classification = peripheral["class"]
         peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac))
     return peripheralList
+
+def _jsonToSampleList(json):
+    """Convert json to list of Sample objects"""
+    sampleList = []
+    for sample in json:
+        sampleList.append(Sample())
+    return sampleList
 
 async def _webRequest(websession, url):
     """Send a webrequest."""
