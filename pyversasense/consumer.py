@@ -93,7 +93,6 @@ def _jsonToSampleList(json):
     sampleList = []
     parentId = json["identifier"]
     for data in json["data"]:
-        print(data)
         unit = data["unit"]
         value = data["value"]
         datatype = data["datatype"]
