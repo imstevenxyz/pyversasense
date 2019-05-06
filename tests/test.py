@@ -20,17 +20,22 @@ class TestConsummer(asynctest.TestCase):
         self.assertEqual(host, url)
 
     def test_device_mac(self):
-        for device in self.deviceList:
+        for mac, device in self.deviceList.items():
+            self.assertEqual(mac, device.mac)
             self.assertIn(device.mac, deviceMacs)
 
     def test_peripheral_id(self):
-        for device in self.deviceList:
-            for peripheral in device.peripherals:
+        for mac, device in self.deviceList.items():
+            self.assertEqual(mac, device.mac)
+            for id, peripheral in device.peripherals.items():
+                self.assertEqual(id, peripheral.identifier)
                 self.assertIn(peripheral.identifier, peripheralIds)
     
     def test_peripheral_measurements(self):
-        for device in self.deviceList:
-            for peripheral in device.peripherals:
+        for mac, device in self.deviceList.items():
+            self.assertEqual(mac, device.mac)
+            for id, peripheral in device.peripherals.items():
+                self.assertEqual(id, peripheral.identifier)
                 for measurement in peripheral.measurements:
                     self.assertIn(measurement.name, measurementNames)
 
@@ -39,8 +44,10 @@ class TestConsummer(asynctest.TestCase):
             self.consumer = Consumer(url, session)
             self.deviceList = await self.consumer.fetchDevices()
 
-            for device in self.deviceList:
-                for peripheral in device.peripherals:
+            for mac, device in self.deviceList.items():
+                self.assertEqual(mac, device.mac)
+                for id, peripheral in device.peripherals.items():
+                    self.assertEqual(id, peripheral.identifier)
                     testsample = await self.consumer.fetchPeripheralSample(peripheral)
                     for sample in testsample:
                         self.assertIn(sample.value, samples)

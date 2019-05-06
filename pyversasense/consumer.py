@@ -63,12 +63,12 @@ class Consumer:
             print(e)
             return None
 
-        self.deviceList =  _jsonToDeviceList(response)
+        self.deviceList =  _jsonToDeviceDict(response)
         return self.deviceList
 
-def _jsonToDeviceList(json):
+def _jsonToDeviceDict(json):
     """Convert json to list of Device objects."""
-    deviceList = []
+    deviceDict = {}
     for jsonDevice in json:
         address = jsonDevice["address"]
         peripherals = jsonDevice["peripherals"]
@@ -80,13 +80,13 @@ def _jsonToDeviceList(json):
         version =jsonDevice["version"]
         mac = jsonDevice["mac"]
         status = jsonDevice["status"]
-        peripheralList = _jsonToPeripheralList(peripherals, mac)
-        deviceList.append(Device(address, peripheralList, name, description, location, type, battery, version, mac, status))
-    return deviceList
+        peripheralList = _jsonToPeripheralDict(peripherals, mac)
+        deviceDict.update({mac : Device(address, peripheralList, name, description, location, type, battery, version, mac, status)})
+    return deviceDict
 
-def _jsonToPeripheralList(json, parentMac):
+def _jsonToPeripheralDict(json, parentMac):
     """Convert json to list of Peripheral objects."""
-    peripheralList =  []
+    peripheralDict =  {}
     for peripheral in json:
         samplingRate = peripheral["sampling_rate"]
         identifier = peripheral["identifier"]
@@ -97,8 +97,8 @@ def _jsonToPeripheralList(json, parentMac):
         classification = peripheral["class"]
         measurements = peripheral["measurements"]
         measurementList = _jsonToMeasurementList(measurements)
-        peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac, measurementList))
-    return peripheralList
+        peripheralDict.update({ identifier : Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac, measurementList)})
+    return peripheralDict
 
 def _jsonToMeasurementList(json):
     """Convert json to list of measurements"""
