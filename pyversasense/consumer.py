@@ -33,9 +33,15 @@ class Consumer:
     def webSession(self, webSession):
         self._webSession = webSession
 
-    async def fetchPeripheralSample(self, peripheral):
+    async def fetchPeripheralSample(self, peripheral=None, identifier=None, parentMac=None):
         """Get a sample for a peripheral."""
-        url = self._host + ENDPOINT_DEVICES + "/" + peripheral.parentMac + "/peripherals/" + peripheral.identifier + "/sample"
+        if peripheral is not None:
+            url = self._host + ENDPOINT_DEVICES + "/" + peripheral.parentMac + "/peripherals/" + peripheral.identifier + "/sample"
+        elif identifier is not None and parentMac is not None:
+            url = self._host + ENDPOINT_DEVICES + "/" + parentMac + "/peripherals/" + identifier + "/sample"
+        else:
+            raise Exception("Bad arguments")
+
         try:
             response = await _webRequest(self._webSession, url)
         except Exception as e:

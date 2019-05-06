@@ -36,6 +36,10 @@ class TestConsummer(asynctest.TestCase):
                     testsample = await self.consumer.fetchPeripheralSample(peripheral)
                     for sample in testsample:
                         print(sample.value)
+            
+            testcontrolesample = await self.consumer.fetchPeripheralSample(None, "3303/5702", "00-17-0D-00-00-30-E9-62")
+            for sample in testcontrolesample:
+                print("control {}".format(sample.value))
 
 if __name__ == '__main__':
     asynctest.main()
