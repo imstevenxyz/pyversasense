@@ -4,7 +4,7 @@ long_description = open('README.md').read()
 
 setup(
     name='pyversasense',
-    version='0.0.1',
+    version='0.0.2',
     description='Versasense API consumer',
     long_description=long_description,
     long_description_content_type='text/markdown',
