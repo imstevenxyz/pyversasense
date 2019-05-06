@@ -5,6 +5,7 @@ import aiohttp
 from .device import Device
 from .peripheral import Peripheral
 from .sample import Sample
+from .measurement import Measurement
 from .const import (ENDPOINT_DEVICES)
 
 headers = {'Content-Type': 'application/json'}
@@ -91,8 +92,24 @@ def _jsonToPeripheralList(json, parentMac):
         icon = peripheral["icon"]
         text = peripheral["text"]
         classification = peripheral["class"]
-        peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac))
+        measurements = peripheral["measurements"]
+        measurementList = _jsonToMeasurementList(measurements)
+        peripheralList.append(Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac, measurementList))
     return peripheralList
+
+def _jsonToMeasurementList(json):
+    """Convert json to list of measurements"""
+    measurementList = []
+    for measurement in json:
+        unit = measurement["unit"]
+        rounding = measurement["round"]
+        datatype = measurement["datatype"]
+        origin = measurement["origin"]
+        decimals = measurement["decimals"]
+        name = measurement["name"]
+        formula = measurement["formula"]
+        measurementList.append(Measurement(unit, rounding, datatype, origin, decimals, name, formula))
+    return measurementList
 
 def _jsonToSampleList(json):
     """Convert json to list of Sample objects"""

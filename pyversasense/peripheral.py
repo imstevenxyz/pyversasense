@@ -1,7 +1,7 @@
 class Peripheral:
     """Representation of a peripheral, e.g. sensor."""
     
-    def __init__(self, samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac):
+    def __init__(self, samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac, measurements):
         self._samplingRate = samplingRate
         self._identifier = identifier
         self._lastUpdated = lastUpdated
@@ -10,6 +10,7 @@ class Peripheral:
         self._text = text
         self._classification = classification
         self._parentMac = parentMac
+        self._measurements = measurements
 
     @property
     def samplingRate(self):
@@ -42,3 +43,7 @@ class Peripheral:
     @property
     def parentMac(self):
         return self._parentMac
+
+    @property
+    def measurements(self):
+        return self._measurements
