@@ -41,13 +41,14 @@ class Consumer:
         elif identifier is not None and parentMac is not None:
             url = self._host + ENDPOINT_DEVICES + "/" + parentMac + "/peripherals/" + identifier + "/sample"
         else:
-            raise Exception("Bad arguments")
+            raise ValueError("Bad arguments")
 
         try:
             response = await _webRequest(self._webSession, url)
         except Exception as e:
             print(e)
-            return False
+            return None
+
         samples = _jsonToSampleList(response)
         return samples
 
@@ -55,11 +56,13 @@ class Consumer:
         """Get all devices from API and convert response to a list."""
         self.deviceList.clear()
         url = self._host + ENDPOINT_DEVICES
+
         try:
             response = await _webRequest(self._webSession, url)
         except Exception as e:
             print(e)
-            return False
+            return None
+
         self.deviceList =  _jsonToDeviceList(response)
         return self.deviceList
 
@@ -125,7 +128,7 @@ def _jsonToSampleList(json):
     return sampleList
 
 async def _webRequest(websession, url):
-    """Send a webrequest."""
+    """Send a GET request."""
     async with websession.get(url, headers=headers) as response:
         if response.status == 200:
             data = await response.json(content_type=None)
