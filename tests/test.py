@@ -26,5 +26,16 @@ class TestConsummer(asynctest.TestCase):
             for peripheral in device.peripherals:
                 self.assertIn(peripheral.identifier, peripheralIds)
 
+    async def test_samples(self):
+        async with aiohttp.ClientSession() as session:
+            self.consumer = Consumer(url, session)
+            self.deviceList = await self.consumer.fetchDevices()
+
+            for device in self.deviceList:
+                for peripheral in device.peripherals:
+                    testsample = await self.consumer.fetchPeripheralSample(peripheral)
+                    for sample in testsample:
+                        print(sample.value)
+
 if __name__ == '__main__':
     asynctest.main()

@@ -1,8 +1,9 @@
 class Sample:
 
-    def __init__(self, unit, value, measurement, timestamp, parentId):
+    def __init__(self, unit, value, datatype, measurement, timestamp, parentId):
         self._unit = unit
         self._value = value
+        self._datatype = datatype
         self._measurement = measurement
         self._timestamp = timestamp
         self._parentId = parentId
@@ -14,6 +15,10 @@ class Sample:
     @property
     def value(self):
         return self._value
+
+    @property
+    def datatype(self):
+        return self._datatype
 
     @property
     def measurement(self):

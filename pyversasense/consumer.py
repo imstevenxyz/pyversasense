@@ -41,7 +41,8 @@ class Consumer:
         except Exception as e:
             print(e)
             return False
-        return response
+        samples = _jsonToSampleList(response)
+        return samples
 
     async def fetchDevices(self):
         """Get all devices from API and convert response to a list."""
@@ -90,8 +91,15 @@ def _jsonToPeripheralList(json, parentMac):
 def _jsonToSampleList(json):
     """Convert json to list of Sample objects"""
     sampleList = []
-    for sample in json:
-        sampleList.append(Sample())
+    parentId = json["identifier"]
+    for data in json["data"]:
+        print(data)
+        unit = data["unit"]
+        value = data["value"]
+        datatype = data["datatype"]
+        measurement = data["measurement"]
+        timestamp = data["timestamp"]
+        sampleList.append(Sample(unit, value, datatype, measurement, timestamp, parentId))
     return sampleList
 
 async def _webRequest(websession, url):
