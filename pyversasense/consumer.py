@@ -2,13 +2,8 @@ import json
 import asyncio
 import aiohttp
 
-from .device import Device
-from .peripheral import Peripheral
-from .sample import Sample
-from .measurement import Measurement
-from .const import (ENDPOINT_DEVICES)
-
-headers = {'Content-Type': 'application/json'}
+from .jsonHelpers import jsonToSampleList, jsonToDeviceDict
+from .const import (ENDPOINT_DEVICES, ENDPOINT_SAMPLE, HEADER)
 
 class Consumer:
 
@@ -36,21 +31,39 @@ class Consumer:
 
     async def fetchPeripheralSample(self, peripheral=None, identifier=None, parentMac=None):
         """Get a sample for a peripheral."""
+        url = self._host
         if peripheral is not None:
-            url = self._host + ENDPOINT_DEVICES + "/" + peripheral.parentMac + "/peripherals/" + peripheral.identifier + "/sample"
+            url += ENDPOINT_SAMPLE.format(peripheral.parentMac, peripheral.identifier)
         elif identifier is not None and parentMac is not None:
-            url = self._host + ENDPOINT_DEVICES + "/" + parentMac + "/peripherals/" + identifier + "/sample"
+            url += ENDPOINT_SAMPLE.format(parentMac, identifier)
         else:
             raise ValueError("Bad arguments")
 
         try:
-            response = await _webRequest(self._webSession, url)
+            response = await _getRequest(self._webSession, url)
         except Exception as e:
             print(e)
             return None
 
-        samples = _jsonToSampleList(response)
+        samples = jsonToSampleList(response)
         return samples
+
+    async def actuatePeripheral(self, peripheral=None, identifier=None, parentMac=None, data=None):
+        """Actuate a peripheral."""
+        url =  self._host
+        if peripheral is not None:
+            url += ENDPOINT_SAMPLE.format(peripheral.parentMac, peripheral.identifier)
+        elif identifier is not None and parentMac is not None:
+            url += ENDPOINT_SAMPLE.format(parentMac, identifier)
+        else:
+            raise ValueError("Bad arguments")
+
+        try:
+            response = await _putRequest(self._webSession, url, data)
+        except Exception as e:
+            print(e)
+            return None
+        return response
 
     async def fetchDevices(self):
         """Get all devices from API and convert response to a list."""
@@ -58,78 +71,25 @@ class Consumer:
         url = self._host + ENDPOINT_DEVICES
 
         try:
-            response = await _webRequest(self._webSession, url)
+            response = await _getRequest(self._webSession, url)
         except Exception as e:
             print(e)
             return None
 
-        self.deviceList =  _jsonToDeviceDict(response)
+        self.deviceList =  jsonToDeviceDict(response)
         return self.deviceList
 
-def _jsonToDeviceDict(json):
-    """Convert json to list of Device objects."""
-    deviceDict = {}
-    for jsonDevice in json:
-        address = jsonDevice["address"]
-        peripherals = jsonDevice["peripherals"]
-        name = jsonDevice["name"]
-        description = jsonDevice["description"]
-        location = jsonDevice["location"]
-        type = jsonDevice["type"]
-        battery = jsonDevice["battery"]
-        version =jsonDevice["version"]
-        mac = jsonDevice["mac"]
-        status = jsonDevice["status"]
-        peripheralList = _jsonToPeripheralDict(peripherals, mac)
-        deviceDict.update({mac : Device(address, peripheralList, name, description, location, type, battery, version, mac, status)})
-    return deviceDict
-
-def _jsonToPeripheralDict(json, parentMac):
-    """Convert json to list of Peripheral objects."""
-    peripheralDict =  {}
-    for peripheral in json:
-        samplingRate = peripheral["sampling_rate"]
-        identifier = peripheral["identifier"]
-        lastUpdated = peripheral["last_updated"]
-        color = peripheral["color"]
-        icon = peripheral["icon"]
-        text = peripheral["text"]
-        classification = peripheral["class"]
-        measurements = peripheral["measurements"]
-        measurementList = _jsonToMeasurementList(measurements)
-        peripheralDict.update({ identifier : Peripheral(samplingRate, identifier, lastUpdated, color, icon, text, classification, parentMac, measurementList)})
-    return peripheralDict
-
-def _jsonToMeasurementList(json):
-    """Convert json to list of measurements"""
-    measurementList = []
-    for measurement in json:
-        unit = measurement["unit"]
-        rounding = measurement["round"]
-        datatype = measurement["datatype"]
-        origin = measurement["origin"]
-        decimals = measurement["decimals"]
-        name = measurement["name"]
-        formula = measurement["formula"]
-        measurementList.append(Measurement(unit, rounding, datatype, origin, decimals, name, formula))
-    return measurementList
-
-def _jsonToSampleList(json):
-    """Convert json to list of Sample objects"""
-    sampleList = []
-    parentId = json["identifier"]
-    for data in json["data"]:
-        unit = data["unit"]
-        value = data["value"]
-        datatype = data["datatype"]
-        measurement = data["measurement"]
-        timestamp = data["timestamp"]
-        sampleList.append(Sample(unit, value, datatype, measurement, timestamp, parentId))
-    return sampleList
-
-async def _webRequest(websession, url):
+async def _getRequest(websession, url):
     """Send a GET request."""
-    async with websession.get(url, headers=headers) as response:
+    async with websession.get(url, headers=HEADER) as response:
+        if response.status == 200:
+            data = await response.json(content_type=None)
+        else:
+            raise Exception('Bad response status code: {}'.format(response.status))
+    return data
+
+async def _putRequest(websession, url, data):
+    async with websession.put(url, headers=HEADER, data=data) as response:
         if response.status == 200:
             data = await response.json(content_type=None)
         else:
