@@ -17,7 +17,7 @@ pip install pyversasense
 
 ### Basic Usage
 
-```
+```python
 import asyncio
 import aiohttp
 import pyversasense as pyv
