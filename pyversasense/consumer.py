@@ -89,7 +89,6 @@ async def _getRequest(websession, url):
     return data
 
 async def _putRequest(websession, url, payload):
-    print(url)
     async with websession.put(url, headers=HEADER, json=payload) as response:
         if response.status == 200:
             data = await response.json(content_type=None)
